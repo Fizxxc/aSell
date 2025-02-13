@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WTB/WTS Marketplace</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        .listing {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>WTB/WTS Marketplace</h2>
+    <div class="container">
+        <select id="type">
+            <option value="WTB">WTB (Want to Buy)</option>
+            <option value="WTS">WTS (Want to Sell)</option>
+        </select>
+        <input type="text" id="item" placeholder="Nama Barang" required>
+        <input type="number" id="price" placeholder="Harga" required>
+        <input type="text" id="contact" placeholder="Kontak (WA/Email)" required>
+        <button onclick="addListing()">Tambah Iklan</button>
+        
+        <h3>Daftar Iklan</h3>
+        <div id="listings"></div>
+    </div>
+
+    <script>
+        const BOT_TOKEN = "7807511656:AAGh33sQVmadKtdLpHN47RdOCZMI3G9msyg"; // Ganti dengan token bot Telegram
+        const CHAT_ID = "-1002264863615"; // Ganti dengan ID grup atau channel
+        
+        function addListing() {
+            let type = document.getElementById("type").value;
+            let item = document.getElementById("item").value;
+            let price = document.getElementById("price").value;
+            let contact = document.getElementById("contact").value;
+            
+            if (!item || !price || !contact) {
+                alert("Harap isi semua kolom!");
+                return;
+            }
+            
+            let listingDiv = document.createElement("div");
+            listingDiv.classList.add("listing");
+            listingDiv.innerHTML = `<strong>${type}</strong>: ${item} - Rp${price}<br>Kontak: ${contact}`;
+            document.getElementById("listings").appendChild(listingDiv);
+            
+            // Kirim ke Telegram
+            let message = `📢 *${type}* \n🛒 *Barang:* ${item}\n💰 *Harga:* Rp${price}\n📞 *Kontak:* ${contact}`;
+            sendToTelegram(message);
+            
+            // Reset input
+            document.getElementById("item").value = "";
+            document.getElementById("price").value = "";
+            document.getElementById("contact").value = "";
+        }
+        
+        function sendToTelegram(message) {
+            let url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: "Markdown" })
+            })
+            .then(response => response.json())
+            .then(data => console.log("Pesan terkirim", data))
+            .catch(error => console.error("Error mengirim pesan", error));
+        }
+    </script>
+</body>
+</html>
